@@ -27,7 +27,10 @@ jobs:
           restore-keys: pio-${{ runner.os }}-
 
       - name: Install PlatformIO
-        run: pip install platformio
+        # Pin click < 8.2: the esptool bundled with this platform release calls
+        # the old ParamType.get_metavar() (no ctx arg), which click 8.2 removed,
+        # so bin generation dies with a TypeError. 8.1.x keeps esptool working.
+        run: pip install platformio "click<8.2"
 
       - name: Build
         run: |
