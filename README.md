@@ -137,9 +137,11 @@ These take a typical Super Mini from tens of mA to ~0.15 mA:
 - **Cut the power LED** — it alone can be several mA.
 - **Remove/bypass the onboard LDO** if it back-feeds/leaks with the rail powered
   directly (measure yours). Feed regulated 3V3 straight to the `3V3` pin.
-- **Add a bulk cap (220–470 µF)** at the module's 3V3 pins. Boot inrush can
-  brown out a small/inductive supply so the board "only boots on USB"; small
-  ceramics don't cut it — you need bulk for the ms-scale surge.
+- **Add a cap at the module's 3V3 pins** if the board "only boots on USB" — boot
+  inrush can brown out a weak or long-wired supply. In practice a **10 µF ceramic
+  right at the pins was enough** (possibly even 4.7 µF); placement at the pins
+  matters more than sheer capacitance. Only step up to a larger bulk cap (100s of
+  µF) if a weaker supply still browns out.
 
 ### No crystal? (RC variant)
 
@@ -224,7 +226,7 @@ PlatformIO library, but the power result still requires this template's
 | `RTC slow clock measured = ~136000 Hz` | Crystal not oscillating: check solder/caps/orientation on GPIO0/1, or use the [RC variant](#no-crystal-rc-variant). |
 | Boots ~1/10 after reset | `RTC_EXT_XTAL_BOOTSTRAP_CYCLES` not applied (or too low). Confirm it's in `custom_sdkconfig`; it's maxed (32768) here. |
 | `ConnectionAttemptFailed` when pairing | Stale bond from a reflash → `remove <MAC>` on the central, re-pair. Also confirm CPU stays at 80 MHz (this template does). |
-| Runs on USB, dead on battery | Boot-inrush brownout → add the 220–470 µF bulk cap; small ceramics don't help. |
+| Runs on USB, dead on battery | Boot-inrush brownout → add a cap at the 3V3 pins (a 10 µF ceramic was enough here); go larger only if a weak supply still browns out. |
 | Idle still tens of mA | Cut the power LED; check the LDO back-feed; confirm the crystal reads 32768 and `[PM]` shows `ESP_OK`. |
 | Warm link randomly drops in use | A marginal crystal can start then quit with a high bootstrap value — try `CONFIG_ESP_SYSTEM_RTC_EXT_XTAL_BOOTSTRAP_CYCLES=4096`. |
 
