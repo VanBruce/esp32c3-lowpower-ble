@@ -1,0 +1,9 @@
+# PlatformIO build output + IDE
+.pio/
+.pioenvs/
+.piolibdeps/
+.vscode/
+.idea/
+
+# Your real passkey — never commit it. Only secrets.h.example is tracked.
+src/secrets.h
