@@ -136,8 +136,10 @@ static void apply_power_mode(bool light_sleep) {
 
 // ---- setup / loop ----------------------------------------------------------
 void setup() {
-  // Halve active draw vs the 160MHz default. Safe for BLE; don't go below 80MHz
-  // with the radio active. With light sleep enabled, DFS drops lower when idle.
+  // Pin to 80MHz: halves active draw vs the 160MHz default, and (with min==max
+  // in apply_power_mode) DISABLES DFS — which matters because DFS down to 10MHz
+  // starves the LE-Secure ECDH pairing crypto. The power saving comes from LIGHT
+  // SLEEP gating the clock between BLE events, NOT from frequency scaling.
   setCpuFrequencyMhz(80);
 
   Serial.begin(115200);
@@ -208,7 +210,13 @@ void loop() {
   // mid-pairing (not yet encrypted), capped by CONNECT_AWAKE_MS so a stalled
   // handshake can't pin us awake. Otherwise enable light sleep (low-power link).
   {
-    bool awake = millis() < BOOT_AWAKE_MS ||
+    // Latch the boot grace so it ends exactly once. (A bare `millis() <
+    // BOOT_AWAKE_MS` would become true again every ~49.7 days at the millis()
+    // wrap, briefly kicking the device back to full power.)
+    static bool boot_grace_done = false;
+    if (!boot_grace_done && millis() >= BOOT_AWAKE_MS) boot_grace_done = true;
+
+    bool awake = !boot_grace_done ||
                  (g_connected && !g_authenticated &&
                   (uint32_t)(millis() - g_connect_ms) < CONNECT_AWAKE_MS);
     bool want_light_sleep = !awake;

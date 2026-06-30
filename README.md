@@ -124,6 +124,12 @@ on an unmodified board.
   this first.
 - Verify with the boot log: `RTC slow clock measured = 32768 Hz`.
 
+> **Measuring current? Disconnect USB first.** With `ARDUINO_USB_CDC_ON_BOOT=1`
+> (used here for the debug serial), the USB Serial/JTAG peripheral keeps the chip
+> awake whenever a host cable is attached — so a meter on the USB cable shows tens
+> of mA, *not* ~0.15 mA, and the recipe looks broken. Measure on the 3V3 rail with
+> USB unplugged.
+
 ### Mods for the lowest idle (optional but that's the point)
 
 These take a typical Super Mini from tens of mA to ~0.15 mA:
