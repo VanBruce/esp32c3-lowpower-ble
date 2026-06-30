@@ -1,5 +1,7 @@
 # Reliable sub-mA BLE peripheral on ESP32-C3 (Arduino/NimBLE)
 
+[![build](https://github.com/VanBruce/esp32c3-lowpower-ble/actions/workflows/build.yml/badge.svg)](https://github.com/VanBruce/esp32c3-lowpower-ble/actions/workflows/build.yml)
+
 A **clone-and-go pioarduino template** for an ESP32-C3 BLE peripheral that idles
 at **~0.15 mA while holding its connection open** (a "warm link" — no
 per-command reconnect) and **boots/pairs reliably**. With the board mods below

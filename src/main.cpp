@@ -17,7 +17,10 @@
 #include <Arduino.h>
 #include <NimBLEDevice.h>
 #include "esp_pm.h"
-#include "esp_private/esp_clk.h"   // esp_clk_slowclk_cal_get() — crystal diagnostic
+// Private IDF API, used ONLY for the boot RTC-clock diagnostic print below. If a
+// future IDF/platform bump can't find this header, just delete this include and
+// the [CLK] block in setup() — nothing else depends on it.
+#include "esp_private/esp_clk.h"   // esp_clk_slowclk_cal_get()
 #include "secrets.h"               // defines BLE_PASSKEY (copy secrets.h.example)
 
 // ---- config (SWAP 1) ------------------------------------------------------
@@ -183,6 +186,7 @@ void setup() {
 
   g_state = svc->createCharacteristic(
       CHR_STATE, NIMBLE_PROPERTY::NOTIFY | NIMBLE_PROPERTY::READ_ENC);
+  g_state->setValue(&g_state_val, 1);   // seed it so an early READ isn't empty
 
   svc->start();
 
